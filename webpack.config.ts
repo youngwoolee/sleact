@@ -84,6 +84,12 @@ const config: webpack.Configuration = {
     port: 3080,
     devMiddleware: { publicPath: '/dist/' },
     static: { directory: path.resolve(__dirname) },
+    proxy: {
+      '/api/' : {
+        target: 'http://localhost:3095',
+        changeOrigin: true,
+      }
+    }
   },
 };
 
