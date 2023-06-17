@@ -26,7 +26,7 @@ const LogIn = () => {
           },
         )
         .then((response) => {
-          mutate();
+          mutate(response.data, false); //Optimistic UI
         })
         .catch((error) => {
           setLogInError(error.response?.status === 401);
