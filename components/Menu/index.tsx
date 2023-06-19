@@ -11,6 +11,8 @@ const Menu: FC<PropsWithChildren<Props> > = ({children, style, show, onCloseModa
   const stopPropagation = useCallback((e: any)=> {
     e.stopPropagation(); //이벤트 버블링 막기
   },[]);
+
+  if(!show) return null;
   
   return (
     <CreateMenu onClick={onCloseModal}>
