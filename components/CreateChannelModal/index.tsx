@@ -25,7 +25,7 @@ const CreateChannelModal: VFC<Props> = ({show, onCloseModal, setShowCreateChanne
       dedupingInterval: 2000
     }
   );
-  const { data: channelData, mutate: mutateChannel } = useSWR<IChannel[]>(
+  const {mutate: mutateChannel } = useSWR<IChannel[]>(
     userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null,
     fetcher
   );
@@ -35,9 +35,9 @@ const CreateChannelModal: VFC<Props> = ({show, onCloseModal, setShowCreateChanne
       name: newChannel,
     }, {
       withCredentials: true,
-    }).then(() => {
-      setShowCreateChannelModal(false);
+    }).then((response) => {
       mutateChannel();
+      setShowCreateChannelModal(false);
       setNewChannel('');
     }).catch((error) => {
       console.dir(error);
