@@ -2,13 +2,13 @@ import axios from "axios";
 import React, {VFC, useCallback, useState} from "react";
 import useSWR from "swr";
 import fetcher from '@utils/fethcer';
-import { Redirect, Route, Switch } from "react-router";
+import { Redirect, Route, Switch, useParams } from "react-router";
 import { Header, ProfileImg, RightMenu, WorkspaceWrapper, Workspaces, Channels, Chats, WorkspaceName, MenuScroll, ProfileModal, LogOutButton, WorkspaceButton, AddButton, WorkspaceModal } from "@layouts/Workspace/styles";
 import gravatar from 'gravatar';
 import loadable from '@loadable/component';
 import Menu from "@components/Menu";
 import { Link } from "react-router-dom";
-import { IUser } from "@typings/db";
+import { IChannel, IUser } from "@typings/db";
 import { Button, Input, Label } from "@pages/SignUp/styles";
 import useInput from "@hooks/useInput";
 import Modal from "@components/Modal";
@@ -25,7 +25,18 @@ const Workspace: VFC = () => {
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
-  const {data: userData, error, mutate} = useSWR<IUser | false>('http://localhost:3095/api/users', fetcher);
+  const { workspace} = useParams<{ workspace: string}>();
+  const {data: userData, error, mutate} = useSWR<IUser | false>(
+    'http://localhost:3095/api/users',
+    fetcher,
+    {
+      dedupingInterval: 2000
+    }
+  );
+  const { data: channelData } = useSWR<IChannel[]>(
+    userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null,
+    fetcher
+  );
   const onLogout = useCallback(() => {
     axios.post('http://localhost:3095/api/users/logout', null, {
       withCredentials: true,
@@ -129,12 +140,13 @@ const Workspace: VFC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
+            {channelData?.map((v) => (<div>{v.name}</div>))}
           </MenuScroll>
         </Channels>
         <Chats>
           <Switch>
-            <Route path={'/workspace/channel'} component={Channel} />
-            <Route path={'/workspace/dm'} component={DirectMessage} />
+            <Route path={'/workspace/:workspace/channel/:channel'} component={Channel} />
+            <Route path={'/workspace/:workspace/dm/:id'} component={DirectMessage} />
           </Switch>
         </Chats>
       </WorkspaceWrapper>
@@ -153,7 +165,8 @@ const Workspace: VFC = () => {
       </Modal>
       <CreateChannelModal 
         show={showCreateChannelModal} 
-        onCloseModal={onCloseModal} 
+        onCloseModal={onCloseModal}
+        setShowCreateChannelModal={setShowCreateChannelModal}
       />
       <ToastContainer />
     </div>
