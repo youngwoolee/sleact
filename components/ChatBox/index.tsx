@@ -10,11 +10,11 @@ import gravatar from 'gravatar';
 
 interface Props {
   chat: string;
-  // onSubmitForm: (e: any) => void;
-  // onChangeChat: (e: any) => void;
+  onSubmitForm: (e: any) => void;
+  onChangeChat: (e: any) => void;
   // placeholder?: string;
 }
-const ChatBox: VFC<Props> = ({ chat}) => {
+const ChatBox: VFC<Props> = ({ chat, onSubmitForm, onChangeChat }) => {
   const { workspace } = useParams<{ workspace: string }>();
   const {
     data: userData,
@@ -68,8 +68,9 @@ const ChatBox: VFC<Props> = ({ chat}) => {
 
   return (
     <ChatArea>
-      <Form>
+      <Form onSubmit={onSubmitForm}>
         <MentionsTextarea>
+          <textarea value={chat} onChange={onChangeChat} />
           {/*<Mention*/}
           {/*    appendSpaceOnAdd*/}
           {/*    trigger="@"*/}
