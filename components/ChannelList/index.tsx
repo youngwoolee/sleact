@@ -4,6 +4,7 @@ import { IChannel, IUser } from '@typings/db';
 import fetcher from '@utils/fethcer';
 import React, { FC, useCallback, useState } from 'react';
 import { useParams } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import useSWR from 'swr';
 
 interface Props {
@@ -37,10 +38,17 @@ const ChannelList: FC = () => {
       </h2>
       <div>
         {!channelCollapse &&
-          channelData?.map((channel) => {
-            return(<div></div>);
-            // return;<EachChannel key={channel.id} channel={channel} />;
-          })}
+            channelData?.map((channel) => {
+              return (
+                  <NavLink
+                      key={channel.name}
+                      activeClassName="selected"
+                      to={`/workspace/${workspace}/channel/${channel.name}`}
+                  >
+                    <span># {channel.name}</span>
+                  </NavLink>
+              );
+            })}
       </div>
     </>
   );

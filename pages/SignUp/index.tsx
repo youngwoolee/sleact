@@ -1,12 +1,13 @@
 import React, { useCallback, useState} from 'react';
 import {Form, Error, Label, Input, LinkContainer, Header, Button, Success} from './styles';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, useHistory } from 'react-router-dom';
 import useInput from '@hooks/useInput';
 import axios from 'axios';
 import useSWR from 'swr';
 import fetcher from '@utils/fethcer';
 
 const SignUp = () => {
+  const history = useHistory();
   const {data, error, mutate} = useSWR('/api/users', fetcher);
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
@@ -39,6 +40,7 @@ const SignUp = () => {
         .then((response) => {
           console.log(response);
           setSignUpSuccess(true);
+          history.push('/login');
         })
         .catch((error) => {
           console.log(error.response);
