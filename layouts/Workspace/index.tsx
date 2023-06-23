@@ -53,7 +53,7 @@ const Workspace: VFC = () => {
     }).then(() => {
       mutate(false, false);
     })
-  }, []);
+  }, [mutate]);
 
   const onClickCreateWorkspace = useCallback(() => {
     setShowCreateWorkspaceModal(true);

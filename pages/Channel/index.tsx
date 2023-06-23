@@ -5,17 +5,18 @@ import ChatBox from '@components/ChatBox';
 import useInput from '@hooks/useInput';
 
 const Channel = () => {
-  const [chat, onChangeChat] = useInput('');
+  const [chat, onChangeChat, setChat] = useInput('');
   const onSubmitForm = useCallback((e: any) => {
     e.preventDefault();
     console.log('submit');
+    setChat('');
   }, []);
 
   return (
     <Container>
       <Header>채널</Header>
       <ChatList />
-      <ChatBox chat="" onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
+      <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmitForm={onSubmitForm} />
     </Container>
   );
 };
