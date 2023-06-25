@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, {VFC, useCallback, useState} from "react";
+import React, {VFC, useCallback, useState, useEffect} from "react";
 import useSWR from "swr";
 import fetcher from '@utils/fethcer';
 import { Redirect, Route, Switch, useParams } from "react-router";
@@ -18,6 +18,7 @@ import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
 import InviteChannelModal from "@components/InviteChannelModal";
 import DMList from "@components/DMList";
 import ChannelList from "@components/ChannelList";
+import useSocket from "@hooks/useSocket";
 
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 const Channel = loadable(() => import('@pages/Channel'));
@@ -47,6 +48,24 @@ const Workspace: VFC = () => {
     userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher
   );
+
+  const [socket, disconnect] = useSocket(workspace);
+
+  useEffect(() => {
+    if(channelData && userData && socket) {
+      console.log(socket)
+      socket.emit('login', { id: userData.id, channels: channelData.map((v) => v.id) });
+    }
+  }, [socket, channelData, userData]);
+
+  useEffect(() => {
+    return () => {
+      disconnect();
+      //리스트 안에 바뀔때 함수 실행
+      //리스트에는 외부것도 넣지만 내부것도 넣는다
+    }
+  }, [workspace, disconnect]);
+
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
       withCredentials: true,
