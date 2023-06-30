@@ -2,7 +2,6 @@ import { ChatArea, EachMention, Form, MentionsTextarea, SendButton, Toolbox } fr
 import { IUser } from '@typings/db';
 import fetcher from '@utils/fethcer';
 import React, { useCallback, useEffect, useRef, VFC } from 'react';
-// import autosize from 'autosize';
 import { Mention, SuggestionDataItem } from 'react-mentions';
 import { useParams } from 'react-router';
 import useSWR from 'swr';
