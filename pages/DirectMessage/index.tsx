@@ -1,10 +1,10 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useEffect} from 'react';
 import { Container } from '@pages/Channel/styles';
 import gravatar from 'gravatar';
 import { Header } from '@pages/DirectMessage/styles';
 import useSWR, {mutate} from 'swr';
 import useSWRInfinite from 'swr/infinite'
-import { IDM, IUser } from '@typings/db';
+import { IDM } from '@typings/db';
 import fetcher from '@utils/fethcer';
 import { useParams } from 'react-router';
 import ChatBox from '@components/ChatBox';
@@ -16,8 +16,8 @@ import Scrollbars from 'react-custom-scrollbars';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
-  const { data: userData } = useSWR<IUser>(`/api/workspaces/${workspace}/users/${id}`, fetcher);
-  const { data: myData } = useSWR<IUser>('/api/users', fetcher);
+  const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
+  const { data: myData } = useSWR('/api/users', fetcher);
   const [chat, onChangeChat, setChat] = useInput('');
   const { data: chatData, mutate: mutateChat, setSize } = useSWRInfinite<IDM[]>(
     (index) => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${index + 1}`,
@@ -29,20 +29,45 @@ const DirectMessage = () => {
   const onSubmitForm = useCallback(
     (e: any) => {
       e.preventDefault();
-      if (chat?.trim()) {
+      if (chat?.trim() && chatData) {
+        const savedChat = chat;
+        mutateChat((prevChatData) => {
+          prevChatData?.[0].unshift({
+            id: (chatData[0][0]?.id || 0) + 1,
+            content: savedChat,
+            SenderId: myData.id,
+            Sender: myData,
+            ReceiverId: userData.id,
+            Receiver: userData,
+            createdAt: new Date(),
+          });
+          return prevChatData;
+        }, false).then(() => {
+          setChat('');
+          scrollbarRef.current?.scrollToBottom();
+        });
+
         axios
           .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
             content: chat,
           })
           .then(() => {
             mutateChat();
-            setChat('');
           })
           .catch(console.error);
       }
     },
-    [chat, chatData],
+    [chat, chatData, myData, userData, workspace, id],
   );
+
+  //f로딩 시 스크롤바 제일 아래로
+  useEffect(() => {
+    if(chatData?.length === 1) {
+      setTimeout(() => {
+        scrollbarRef.current?.scrollToBottom();
+      }, 100);
+    }
+  }, [chatData]);
 
   if (!userData || !myData) {
     return null;

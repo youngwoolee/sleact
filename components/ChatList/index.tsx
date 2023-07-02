@@ -3,6 +3,9 @@ import React, { FC, useCallback, useRef, forwardRef } from 'react';
 import { IDM } from '@typings/db';
 import Chat from '@components/Chat';
 import { Scrollbars } from 'react-custom-scrollbars';
+import {
+  MutableRefObject
+} from '../../../../../../../Applications/IntelliJ IDEA.app/Contents/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/react';
 
 interface Props {
   chatSections: { [key: string]: IDM[] };
@@ -12,7 +15,7 @@ interface Props {
 }
 
 
-const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isEmpty, isReachingEnd }, ref) => {
+const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isEmpty, isReachingEnd, }, scrollRef) => {
   const onScroll = useCallback((values: any) => {
     if(values.scrollTop === 0 && !isReachingEnd) {
       console.log('가장 위');
@@ -20,13 +23,16 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isEmpty
       setSize((prevSize) => prevSize + 1)
         .then(() => {
           //스크롤 위치 유지
-
+          const current = (scrollRef as MutableRefObject<Scrollbars>)?.current;
+          if (current) {
+            current.scrollTop(current.getScrollHeight() - values.scrollHeight);
+          }
         });
     }
   }, []);
   return (
     <ChatZone>
-      <Scrollbars autoHide ref={ref} onScrollFrame={onScroll}>
+      <Scrollbars autoHide ref={scrollRef} onScrollFrame={onScroll}>
         {Object.entries(chatSections).map(([date, chats]) => {
           return (
             <Section className={`section-${date}`} key={date}>
