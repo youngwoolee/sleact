@@ -1,15 +1,12 @@
 import { ChatZone, StickyHeader, Section } from '@components/ChatList/styles';
-import React, { FC, useCallback, useRef, forwardRef } from 'react';
-import { IDM } from '@typings/db';
+import React, { FC, useCallback, useRef, forwardRef, MutableRefObject } from 'react';
+import { IChat, IDM } from '@typings/db';
 import Chat from '@components/Chat';
 import { Scrollbars } from 'react-custom-scrollbars';
-import {
-  MutableRefObject
-} from '../../../../../../../Applications/IntelliJ IDEA.app/Contents/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/react';
 
 interface Props {
-  chatSections: { [key: string]: IDM[] };
-  setSize: (f: (size: number) => number) => Promise<IDM[][] | undefined>
+  chatSections: { [key: string]: (IDM | IChat)[] };
+  setSize: (f: (size: number) => number) => Promise<(IDM | IChat)[][] | undefined>
   isEmpty: boolean;
   isReachingEnd: boolean;
 }
